@@ -34,7 +34,7 @@ class Link(ABC):
 
 
 class UserRepositoriesLink(Link):
-    pattern = r'https://github.com/[\w-]+\/?$'
+    pattern = r'(https://github.com/[\w-]+)/?(\?tab=[\w-]+)?'
 
     def __init__(self, url: str):
         self.url = url
@@ -44,8 +44,9 @@ class UserRepositoriesLink(Link):
 
     @property
     def meta(self) -> dict:
+        url = re.match(self.pattern, self.url).group(1)
         return {
-            'url': f"{self.url}?tab=repositories",
+            'url': f"{url}?tab=repositories",
             'xpath': '//div[@id="user-repositories-list"]/ul/li/div/div/h3/a[@href]',
             'next_xpath': '//a[@class="next_page"]'
         }
@@ -97,6 +98,8 @@ class GithubBackend(Backend):
                 except NotImplementedError as e:
                     logger.error(e)
                 break
+        else:
+            logger.error('Provided link does not support extraction yet. Please contact package owner to add feature.')
 
         return self.links
 
@@ -120,12 +123,12 @@ class GithubBackend(Backend):
                     self.wd.get(link)
                 else:
                     link = next_link
-                    time.sleep(1.5)
+                    time.sleep(1)
         except KeyboardInterrupt:
             logger.error('Stopping crawler...')
         finally:
             self.wd.quit()
-            logger.error('Crawler Stopped')
+            logger.info('Crawler Stopped')
 
     @property
     def _is_banned(self):
@@ -156,7 +159,7 @@ class GithubBackend(Backend):
         next_page_element = self.get_next_page_element(link_object=link_object)
         if next_page_element:
             next_page_element.click()
-            time.sleep(0.5)
+            time.sleep(1)
             return self.wd.current_url
 
     def get_next_page_element(self, link_object: Link):

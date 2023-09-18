@@ -9,7 +9,7 @@
 Version:
 --------
 
-- github-domain-scraper v1.0.1
+- github-domain-scraper v1.0.2
 """
 import argparse
 

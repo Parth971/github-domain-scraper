@@ -29,7 +29,7 @@ def main():
 
     extractor = LinkExtractor(initial_link=github_link)
     result = extractor.extract(jsonfile=args.json)
-    if args.json:
+    if not args.json:
         print(result)
 
 

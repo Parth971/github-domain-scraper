@@ -18,4 +18,4 @@ class LinkExtractor:
     def extract(self):
         logger.info('Extracting...')
         parser = GithubBackend(total_links_to_download=self.total_links_to_download)
-        return parser.process(url=self.initial_link)
+        return parser.process(url=self.initial_link)[:self.total_links_to_download]

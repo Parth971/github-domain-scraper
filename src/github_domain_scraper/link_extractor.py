@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 
@@ -16,14 +15,7 @@ class LinkExtractor:
         self.initial_link = initial_link
         self.total_links_to_download = total_links_to_download
 
-    def extract(self, jsonfile=None):
+    def extract(self):
         logger.info('Extracting...')
         parser = GithubBackend(total_links_to_download=self.total_links_to_download)
-        result = parser.process(url=self.initial_link)
-
-        if jsonfile:
-            with open(jsonfile, "w") as file:
-                json.dump(result, file, indent=4)
-            logger.info(f'Saved links to {jsonfile}')
-        else:
-            return result
+        return parser.process(url=self.initial_link)

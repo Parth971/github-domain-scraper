@@ -12,25 +12,36 @@ Version:
 - github-domain-scraper v1.0.2
 """
 import argparse
+import json
 
 from github_domain_scraper.link_extractor import LinkExtractor
+from github_domain_scraper.logger import get_logger
 
+logger = get_logger(__file__)
 
-def main():
+def parse():
     parser = argparse.ArgumentParser(description="GitHub Domain Scraper")
     parser.add_argument("--link", type=str, help="GitHub link to scrape", required=True)
     parser.add_argument("--json", type=str, help="JSON file to save results")
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    github_link = args.link
-    if not github_link:
-        raise SystemExit()
 
-    extractor = LinkExtractor(initial_link=github_link)
-    result = extractor.extract(jsonfile=args.json)
-    if not args.json:
-        print(result)
+def extract(link, jsonfile):
+    extractor = LinkExtractor(initial_link=link)
+    result = extractor.extract()
+
+    if jsonfile:
+        with open(jsonfile, "w") as file:
+            json.dump(result, file, indent=4)
+        logger.info(f'Saved links to {jsonfile}')
+    else:
+        logger.info(f"Extracted domains are {result}")
+
+
+def main():
+    args = parse()
+    extract(args.link, args.json)
 
 
 if __name__ == "__main__":

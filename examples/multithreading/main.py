@@ -1,10 +1,18 @@
+import json
 from threading import Thread
 from github_domain_scraper.link_extractor import LinkExtractor
 
 
 # Define a function to perform extraction in a thread
 def extractor(link, filename):
-    LinkExtractor(initial_link=link).extract(jsonfile=filename)
+    links = LinkExtractor(initial_link=link).extract()
+    print(links)
+
+    # here you can implement other functionality after getting list of user repositories links
+    with open(filename, "w") as file:
+        json.dump(links, file, indent=4)
+
+    print(f'Saved links to {filename}')
 
 
 if __name__ == '__main__':

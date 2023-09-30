@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Optional
 
 from github_domain_scraper.logger import get_logger
 from github_domain_scraper.parser import GithubBackend
@@ -11,9 +12,9 @@ logger = get_logger(__file__)
 class LinkExtractor:
     github_domain = 'https://github.com/'
 
-    def __init__(self, initial_link: str, total_links_to_download: int = sys.maxsize):
+    def __init__(self, initial_link: str, total_links_to_download: Optional[int] = None):
         self.initial_link = initial_link
-        self.total_links_to_download = total_links_to_download
+        self.total_links_to_download = total_links_to_download or sys.maxsize
 
     def extract(self):
         logger.info('Extracting...')

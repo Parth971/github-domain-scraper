@@ -34,7 +34,7 @@ class Link(ABC):
 
 
 class UserRepositoriesLink(Link):
-    pattern = r'(https://github.com/[\w-]+)/?(\?tab=[\w-]+)?'
+    pattern = r'^(https:\/\/github.com\/[a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38})\/?(\?tab=[\w-]+(.*)?)?$'
 
     def __init__(self, url: str):
         self.url = url

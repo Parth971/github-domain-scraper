@@ -1,6 +1,7 @@
 import contextlib
 import re
 import time
+import urllib.parse
 from abc import ABC, abstractmethod
 
 from selenium.common import TimeoutException, NoSuchElementException
@@ -8,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
+from github_domain_scraper.exceptions import InvalidSearchType
 from github_domain_scraper.logger import get_logger
 from github_domain_scraper.driver import SeleniumWebDriver
 
@@ -53,7 +55,20 @@ class UserRepositoriesLink(Link):
 
 
 class SearchRepositoryLink(Link):
-    pattern = r'https://github.com/search'
+    pattern = r'^https:\/\/github.com\/search\?'
+    x_paths = {
+        'code': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'repositories': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'issues': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'pullrequests': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'discussions': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'users': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'commits': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'registrypackages': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'wikis': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'topics': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+        'marketplace': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
+    }
 
     def __init__(self, url: str):
         self.url = url
@@ -62,10 +77,21 @@ class SearchRepositoryLink(Link):
         return bool(re.match(self.pattern, self.url))
 
     @property
+    def xpath(self):
+        try:
+            parsed_url = urllib.parse.urlparse(self.url)
+            query_params = urllib.parse.parse_qs(parsed_url.query)
+            search_type = query_params['type'][0].lower()
+            return self.x_paths[search_type]
+        except (KeyError, IndexError):
+            raise InvalidSearchType(
+                'Provided search type does not support extraction yet. Please contact package owner to add feature.'
+            )
+    @property
     def meta(self) -> dict:
         return {
             'url': self.url,
-            'xpath': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]/a[@href]',
+            'xpath': self.xpath,
             'next_xpath': '//a[text()="Next"]'
         }
 
@@ -95,7 +121,7 @@ class GithubBackend(Backend):
                 logger.debug(f'URL matched for {link_object.__class__.__name__} class')
                 try:
                     self._start(link_object)
-                except NotImplementedError as e:
+                except (NotImplementedError, KeyError) as e:
                     logger.error(e)
                 break
         else:

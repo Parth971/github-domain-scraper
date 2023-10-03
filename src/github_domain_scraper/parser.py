@@ -57,7 +57,6 @@ class UserRepositoriesLink(Link):
 class SearchRepositoryLink(Link):
     pattern = r'^https:\/\/github.com\/search\?'
     x_paths = {
-        'code': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
         'repositories': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
         'issues': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
         'pullrequests': '//div[@data-testid="results-list"]//div[contains(@class, "search-title")]//a[1]',
@@ -85,7 +84,7 @@ class SearchRepositoryLink(Link):
             return self.x_paths[search_type]
         except (KeyError, IndexError):
             raise InvalidSearchType(
-                'Provided search type does not support extraction yet. Please contact package owner to add feature.'
+                'Provided link does not support extraction yet. Please contact package owner to add feature.'
             )
     @property
     def meta(self) -> dict:
@@ -121,7 +120,7 @@ class GithubBackend(Backend):
                 logger.debug(f'URL matched for {link_object.__class__.__name__} class')
                 try:
                     self._start(link_object)
-                except (NotImplementedError, KeyError) as e:
+                except (NotImplementedError, InvalidSearchType) as e:
                     logger.error(e)
                 break
         else:

@@ -1,6 +1,6 @@
 import json
 from threading import Thread
-from github_domain_scraper.link_extractor import LinkExtractor
+from github_domain_scraper.extractor import LinkExtractor
 
 
 # Define a function to perform extraction in a thread

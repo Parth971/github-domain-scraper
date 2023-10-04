@@ -1,5 +1,5 @@
 # Import the LinkExtractor class from the github_domain_scraper package
-from github_domain_scraper.link_extractor import LinkExtractor
+from github_domain_scraper.extractor import LinkExtractor
 
 if __name__ == '__main__':
     # Define the GitHub user's profile link

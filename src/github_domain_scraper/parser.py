@@ -3,6 +3,7 @@ import re
 import time
 import urllib.parse
 from abc import ABC, abstractmethod
+from typing import List
 
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -19,7 +20,7 @@ logger = get_logger(__file__)
 class Backend(ABC):
 
     @abstractmethod
-    def process(self, url):
+    def process(self, *args, **kwargs):
         pass
 
 
@@ -86,6 +87,7 @@ class SearchRepositoryLink(Link):
             raise InvalidSearchType(
                 'Provided link does not support extraction yet. Please contact package owner to add feature.'
             )
+
     @property
     def meta(self) -> dict:
         return {
@@ -95,22 +97,30 @@ class SearchRepositoryLink(Link):
         }
 
 
-class GithubBackend(Backend):
+class BackendUtility:
+    webdriver_waiting_time = 10
+
+    def __init__(self, banned_waiting_time: int = 30):
+        self.wd = SeleniumWebDriver().webdriver
+        self.banned_waiting_time = banned_waiting_time
+
+    @property
+    def _is_banned(self):
+        return (
+                bool(self.wd.find_elements(By.XPATH, "//title[contains(text(),'Rate limit')]")) or
+                bool(self.wd.find_elements(By.XPATH, "//title[contains(text(),'Error 429')]"))
+        )
+
+
+class ListBackend(Backend, BackendUtility):
     link_classes = [
         UserRepositoriesLink,
         SearchRepositoryLink
     ]
-    webdriver_waiting_time = 10
 
-    def __init__(
-            self,
-            total_links_to_download: int,
-            banned_waiting_time: int = 30
-    ):
-        self.wd = SeleniumWebDriver().webdriver
-        # self.wd_wait = WebDriverWait(self.wd, self.webdriver_waiting_time)
+    def __init__(self, total_links_to_download: int, **kwargs):
+        super().__init__(**kwargs)
         self.total_links_to_download = total_links_to_download
-        self.banned_waiting_time = banned_waiting_time
         self.links = []
 
     def process(self, url: str) -> list:
@@ -155,13 +165,6 @@ class GithubBackend(Backend):
             self.wd.quit()
             logger.info('Crawler Stopped')
 
-    @property
-    def _is_banned(self):
-        return (
-                bool(self.wd.find_elements(By.XPATH, "//title[contains(text(),'Rate limit')]")) or
-                bool(self.wd.find_elements(By.XPATH, "//title[contains(text(),'Error 429')]"))
-        )
-
     def _parse(self, link_object: Link):
         element = link_object.meta.get('xpath')
         if not element:
@@ -197,3 +200,146 @@ class GithubBackend(Backend):
 
         with contextlib.suppress(NoSuchElementException):
             return self.wd.find_element(By.XPATH, next_xpath)
+
+
+class UserProfileBackend(Backend, BackendUtility):
+    user_profile_url = "https://github.com/%s"
+    fields = [
+        'avatar', 'fullname', 'username', 'bio', 'followers', 'following', 'works_for', 'home_location',
+        'email', 'profile_website_url', 'social', 'achievements', 'organizations', 'number_of_repositories',
+        'number_of_stars', 'pinned_repositories'
+    ]
+
+    @property
+    def _avatar(self):
+        if elements := self.wd.find_elements(By.XPATH, '//a[@itemprop="image"]'):
+            return elements[0].get_attribute('href')
+
+    @property
+    def _fullname(self):
+        if elements := self.wd.find_elements(By.XPATH, '//h1[@class="vcard-names "]/span[1]'):
+            return elements[0].text
+
+    @property
+    def _username(self):
+        if elements := self.wd.find_elements(By.XPATH, '//h1[@class="vcard-names "]/span[2]'):
+            return elements[0].text
+
+    @property
+    def _bio(self):
+        if elements := self.wd.find_elements(By.XPATH, '//div[contains(@class, "user-profile-bio")]/div'):
+            return elements[0].text
+
+    @property
+    def _followers(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//div[contains(@class, "js-profile-editable-area")]/div[2]//a[1]/span'
+        ):
+            return elements[0].text
+
+    @property
+    def _following(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//div[contains(@class, "js-profile-editable-area")]/div[2]//a[2]/span'
+        ):
+            return elements[0].text
+
+    @property
+    def _works_for(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//ul[@class="vcard-details"]/li[@itemprop="worksFor"]/span/div'
+        ):
+            return elements[0].text
+
+    @property
+    def _home_location(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//ul[@class="vcard-details"]/li[@itemprop="homeLocation"]/span'
+        ):
+            return elements[0].text
+
+    @property
+    def _email(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//ul[@class="vcard-details"]/li[@itemprop="email"]/a'
+        ):
+            return elements[0].text
+
+    @property
+    def _profile_website_url(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//ul[@class="vcard-details"]/li[@itemprop="url"]/a'
+        ):
+            return elements[0].text
+
+    @property
+    def _social(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//ul[@class="vcard-details"]/li[@itemprop="social"]/a'
+        ):
+            return [element.get_attribute('href') for element in elements]
+
+    @property
+    def _achievements(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//img[@data-hovercard-type="achievement"]'
+        ):
+            return list({element.get_attribute('alt').replace('Achievement: ', "") for element in elements})
+
+    @property
+    def _organizations(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//a[@data-hovercard-type="organization" and @itemprop="follows"]'
+        ):
+            return [element.get_attribute('href') for element in elements]
+
+    @property
+    def _number_of_repositories(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//a[@data-tab-item="repositories"]/span'
+        ):
+            return elements[0].text
+
+    @property
+    def _number_of_stars(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//a[@data-tab-item="stars"]/span'
+        ):
+            return elements[0].text
+
+    @property
+    def _pinned_repositories(self):
+        if elements := self.wd.find_elements(
+                By.XPATH, '//div[@class="pinned-item-list-item-content"]/div/div/a'
+        ):
+            return [element.get_attribute('href') for element in elements]
+
+    def process(self, usernames: List[str]) -> list:
+        users_information = []
+        try:
+            # self.wd.execute_script("window.open()")
+            self.wd.switch_to.window(self.wd.window_handles[-1])
+            for username in usernames:
+                users_information.append({username: self._start(url=self.user_profile_url % username)})
+        except KeyboardInterrupt:
+            logger.error('Stopping crawler...')
+        finally:
+            self.wd.quit()
+            logger.info('Crawler Stopped')
+
+        return users_information
+
+    def _start(self, url):
+        if self._is_banned:
+            logger.info(f'Banned!! Script will retry after {self.banned_waiting_time} seconds')
+            time.sleep(self.banned_waiting_time)
+            return self._start(url)
+
+        self.wd.get(url)
+        return self.extract_fields()
+
+    def extract_fields(self):
+        return {
+            field: getattr(self, f"_{field}")
+            for field in self.fields
+        }

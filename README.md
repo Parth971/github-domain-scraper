@@ -37,7 +37,7 @@ Import the `LinkExtractor` class from `github_domain_scraper.link_extractor` and
 follows:
 
    ```python
-   from github_domain_scraper.link_extractor import LinkExtractor
+   from github_domain_scraper.extractor import LinkExtractor
 
 links = LinkExtractor(initial_link="github_link").extract()
    ```
@@ -48,3 +48,5 @@ This makes it easy to incorporate github-domain-scraper functionality into your 
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
+
+github_domain_scraper.extractor

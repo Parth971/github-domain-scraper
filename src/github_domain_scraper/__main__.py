@@ -1,11 +1,14 @@
 """Usage:
 --------
 
-    $ github_domain_scraper --link=<github_link> [--json=filename] [--max-repositories=<max_repositories>]
+    $ github_domain_scraper [--link=<github_link> | --github-username=<github_username>]
+                            [--json=filename] [--max-repositories=<max_repositories>]
 
-    where github_link is the URL of GitHub domain
-    filename is the json file name. e.g. username.json
-    max_repositories is an optional argument to limit the number of repositories to scrape.
+    where:
+    - github_link is the URL of GitHub domain to scrape.
+    - github_username is a GitHub username or a list of usernames to extract.
+    - filename is the JSON file name to save results (e.g., username.json).
+    - max_repositories is an optional argument to limit the number of repositories to scrape (only used with --link).
 
 Version:
 --------

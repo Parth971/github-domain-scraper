@@ -314,13 +314,14 @@ class UserProfileBackend(Backend, BackendUtility):
         ):
             return [element.get_attribute('href') for element in elements]
 
-    def process(self, usernames: List[str]) -> list:
-        users_information = []
+    def process(self, usernames: List[str]) -> dict:
+        users_information = {}
         try:
             # self.wd.execute_script("window.open()")
             self.wd.switch_to.window(self.wd.window_handles[-1])
             for username in usernames:
-                users_information.append({username: self._start(url=self.user_profile_url % username)})
+                logger.info(f'Crawling for user {username}')
+                users_information[username] = self._start(url=self.user_profile_url % username)
         except KeyboardInterrupt:
             logger.error('Stopping crawler...')
         finally:

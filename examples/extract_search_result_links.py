@@ -8,6 +8,9 @@ if __name__ == '__main__':
     # Create an instance of the LinkExtractor class with the initial search link and desired link count
     extractor = LinkExtractor(initial_link=link)
 
+    # To provide max-repositories argument
+    # extractor = LinkExtractor(initial_link=link, total_links_to_download=10)
+
     # Extract links from the search results
     links = extractor.extract()
 

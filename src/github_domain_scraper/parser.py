@@ -175,7 +175,7 @@ class GithubBackend(Backend):
                 expected_conditions.presence_of_all_elements_located((By.XPATH, element))
             )
         except TimeoutException:
-            logger.error(f'Error in detecting links using xpath - {element}')
+            logger.debug(f'Error in detecting links using xpath - {element}')
             return None
 
         repositories = [elem.get_attribute("href") for elem in self.wd.find_elements(By.XPATH, element)]

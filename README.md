@@ -64,11 +64,11 @@ You can use the `github-domain-scraper` as a command-line tool to extract inform
     python -m github_domain_scraper --github-username Parth971
     ```
 
-```bash
-python -m github_domain_scraper \
-    --github-username Parth971 OrionXV oriana04bedoya oriolval Ailothaen \
-    --json output.json
-```
+   ```bash
+   python -m github_domain_scraper \
+       --github-username Parth971 OrionXV oriana04bedoya oriolval Ailothaen \
+       --json output.json
+   ```
 
 ### Integration in Python Modules
 

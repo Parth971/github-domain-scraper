@@ -22,47 +22,47 @@ The `github-domain-scraper` is having wide variety of use-cases
 
 You can use the `github-domain-scraper` as a command-line tool to extract information from GitHub domains:
 
-#### Extracting `Users Repositories` links
+1. Extracting `Users Repositories` links
 
-```bash
-python -m github_domain_scraper --link="https://github.com/Parth971"
-```
+    ```bash
+    python -m github_domain_scraper --link="https://github.com/Parth971"
+    ```
 
-You can also specify a JSON output file for the results and maximum number of links:
-    
-```bash
-python -m github_domain_scraper \
-    --link "https://github.com/Parth971" \
-    --json output.json \
-    --max-repositories 10
-```
+   You can also specify a JSON output file for the results and maximum number of links:
+        
+    ```bash
+    python -m github_domain_scraper \
+        --link "https://github.com/Parth971" \
+        --json output.json \
+        --max-repositories 10
+    ```
 
-#### Extracting links from `Search result`
+2. Extracting links from `Search result`
 
-```bash
-python -m github_domain_scraper --link "https://github.com/search?q=ori+python&type=users"
-```
+    ```bash
+    python -m github_domain_scraper --link "https://github.com/search?q=ori+python&type=users"
+    ```
 
-You can also specify a JSON output file for the results and maximum number of links:
-    
-```bash
-python -m github_domain_scraper \
-    --link "https://github.com/search?q=ori+python&type=users" \
-    --json output.json \
-    --max-repositories 10
-```
+   You can also specify a JSON output file for the results and maximum number of links:
 
-#### Extracting `User Profile` Information
+    ```bash
+    python -m github_domain_scraper \
+        --link "https://github.com/search?q=ori+python&type=users" \
+        --json output.json \
+        --max-repositories 10
+    ```
 
-```bash
-python -m github_domain_scraper --github-username <GitHub Username> [<GitHub Username>, ...]
-```
+3. Extracting `User Profile` Information
 
-You can also specify a JSON output file for the results:
-    
-```bash
-python -m github_domain_scraper --github-username Parth971
-```
+    ```bash
+    python -m github_domain_scraper --github-username <GitHub Username> [<GitHub Username>, ...]
+    ```
+
+   You can also specify a JSON output file for the results:
+
+    ```bash
+    python -m github_domain_scraper --github-username Parth971
+    ```
 
 ```bash
 python -m github_domain_scraper \
@@ -88,6 +88,5 @@ This makes it easy to incorporate github-domain-scraper functionality into your 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
-
 
 github_domain_scraper.extractor

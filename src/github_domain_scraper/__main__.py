@@ -15,28 +15,37 @@ Version:
 
 - github-domain-scraper v2.0.1
 """
+
 import argparse
 import json
+from typing import List, Optional, Union
 
-from github_domain_scraper.extractor import LinkExtractor, UserProfileInformationExtractor
-from github_domain_scraper.logger import get_logger
+from .extractor import (
+    LinkExtractor,
+    UserProfileInformationExtractor,
+)
+from .logger import get_logger
 
-logger = get_logger(__file__)
+logger = get_logger("github_domain_scraper")
 
 
-def parse():
+def parse() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="GitHub Domain Scraper")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--link", type=str, help="GitHub link to scrape")
-    group.add_argument("--github-username", nargs='+', type=str, help="GitHub username(s) to scrape")
+    group.add_argument(
+        "--github-username", nargs="+", type=str, help="GitHub username(s) to scrape"
+    )
 
     parser.add_argument("--json", type=str, help="JSON file to save results")
-    parser.add_argument("--max-repositories", type=int, help="Maximum number of repositories to scrape")
+    parser.add_argument(
+        "--max-repositories", type=int, help="Maximum number of repositories to scrape"
+    )
 
     return parser.parse_args()
 
 
-def extract_user_profiles(usernames, jsonfile):
+def extract_user_profiles(usernames: Union[str, List[str]], jsonfile: str) -> None:
     extractor = UserProfileInformationExtractor(github_username=usernames)
     result = extractor.extract()
 
@@ -48,19 +57,23 @@ def extract_user_profiles(usernames, jsonfile):
         logger.info(f"Extracted user's information are {result}")
 
 
-def extract_links(link, jsonfile, max_repositories):
-    extractor = LinkExtractor(initial_link=link, total_links_to_download=max_repositories)
+def extract_links(link: str, jsonfile: Optional[str], max_repositories: int) -> None:
+    extractor = LinkExtractor(
+        initial_link=link, total_links_to_download=max_repositories
+    )
     result = extractor.extract()
 
     if jsonfile:
         with open(jsonfile, "w") as file:
             json.dump(result, file, indent=4)
-        logger.info(f'Saved links to {jsonfile}')
+        logger.info(f"Saved links to {jsonfile}")
     else:
         logger.info(f"Extracted domains are {result}")
 
+    return None
 
-def main():
+
+def main() -> None:
     args = parse()
 
     if args.link:

@@ -17,19 +17,20 @@ classifiers = [
 keywords = ["github", "crawler", "extractor", "scraper", "github-domain"]
 dependencies = [
     "selenium>=4.5.0",
-    "webdriver-manager>=4.0.0"
+    "webdriver-manager>=4.0.0",
+    "undetected-chromedriver>=3.1.5",
 ]
 requires-python = ">=3.8"
 
-    [project.optional-dependencies]
-    build = ["build", "twine"]
-    dev   = ["black", "bumpver", "isort", "mypy", "pytest"]
+[project.optional-dependencies]
+build = ["build", "twine"]
+dev   = ["black", "bumpver", "isort", "mypy", "pytest"]
 
-    [project.scripts]
-    realpython = "github_domain_scraper.__main__:main"
+[project.scripts]
+realpython = "github_domain_scraper.__main__:main"
 
-    [project.urls]
-    repository    = "https://github.com/Parth971/github-domain-scraper"
+[project.urls]
+repository    = "https://github.com/Parth971/github-domain-scraper"
 
 
 [tool.bumpver]
@@ -40,13 +41,13 @@ commit          = true
 tag             = true
 push            = false
 
-    [tool.bumpver.file_patterns]
-    "pyproject.toml" = [
-        'current_version = "{version}"',
-        'version = "{version}"',
-    ]
-    "src/github_domain_scraper/__init__.py" = ["{version}"]
-    "src/github_domain_scraper/__main__.py" = ["- github-domain-scraper v{version}"]
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"',
+]
+"src/github_domain_scraper/__init__.py" = ["{version}"]
+"src/github_domain_scraper/__main__.py" = ["- github-domain-scraper v{version}"]
 
 [tool.isort]
 profile                   = "black"
@@ -57,6 +58,6 @@ import_heading_firstparty = "Reader imports"
 [tool.mypy]
 strict = true
 
-    [[tool.mypy.overrides]]
-    module                 = "feedparser"
-    ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module                 = "feedparser"
+ignore_missing_imports = true

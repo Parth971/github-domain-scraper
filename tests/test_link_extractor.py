@@ -3,7 +3,7 @@ from github_domain_scraper.extractor import LinkExtractor
 
 
 class TestLinkExtractor(unittest.TestCase):
-    def test_extract_links_for_search_result(self):
+    def test_extract_links_for_search_result(self) -> None:
         # Define a test GitHub search link
         test_link = "https://github.com/search?q=test+python&type=users"
 
@@ -14,9 +14,11 @@ class TestLinkExtractor(unittest.TestCase):
         links = extractor.extract()
 
         # Check if the number of extracted links matches the specified count
-        self.assertEqual(len(links), 5, 'Search results is not having at least 5 results!')
+        self.assertEqual(
+            len(links), 5, "Search results is not having at least 5 results!"
+        )
 
-    def test_extract_links_for_user_repository(self):
+    def test_extract_links_for_user_repository(self) -> None:
         # Define a test GitHub search link
         test_link = "https://github.com/Parth971"
 
@@ -27,8 +29,10 @@ class TestLinkExtractor(unittest.TestCase):
         links = extractor.extract()
 
         # Check if the number of extracted links matches the specified count
-        self.assertEqual(len(links), 5, 'User Parth971 does not contains at least 5 repositories!')
+        self.assertEqual(
+            len(links), 5, "User Parth971 does not contains at least 5 repositories!"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

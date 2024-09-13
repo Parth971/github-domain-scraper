@@ -6,7 +6,7 @@ variety of use-cases, making it a versatile solution for various scenarios.
 
 ## Installation
 
-You can install the `github-domain-scraper` from [PyPI](https://pypi.org/project/realpython-reader/):
+You can install the `github-domain-scraper` from [PyPI](https://pypi.org/project/github-domain-scraper/):
 
 ```bash
 python -m pip install github-domain-scraper

@@ -85,8 +85,10 @@ info = UserProfileInformationExtractor(github_username="Parth971").extract()
 
 This makes it easy to incorporate github-domain-scraper functionality into your custom Python projects.
 
+## Documentation
+
+For detailed documentation, including publishing guides and development information, see the [docs](./docs/) directory.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
-
-github_domain_scraper.extractor

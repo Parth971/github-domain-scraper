@@ -2,38 +2,16 @@ import contextlib
 import re
 from typing import List, Optional, Dict, Any
 
+from github_domain_scraper.interfaces.user_profile import UserProfile
 
-from .base import BaseUserProfileBackend
+
+from github_domain_scraper.backends.base import BaseUserProfileBackend
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 class UserProfileBackend(BaseUserProfileBackend):
-    fields = [
-        "avatar",
-        "fullname",
-        "username",
-        "bio",
-        "followers",
-        "following",
-        "works_for",
-        "home_location",
-        "email",
-        "profile_website_url",
-        "social",
-        "achievements",
-        "organizations",
-        "number_of_repositories",
-        "number_of_stars",
-        "pinned_repositories",
-        "uid",
-        "projects",
-        "contribs",
-        "contrib_matrix",
-        "type",
-        "url",
-    ]
     timeout = 0.5
 
     @property
@@ -169,7 +147,7 @@ class UserProfileBackend(BaseUserProfileBackend):
                 for element in elements
                 if element.get_attribute("href")
             ]
-            return social
+            return list(set(social))
         return None
 
     @property
@@ -186,7 +164,7 @@ class UserProfileBackend(BaseUserProfileBackend):
                     achievement = alt.replace("Achievement: ", "")
                     if achievement:
                         achievements.append(achievement)
-            return achievements
+            return list(set(achievements))
         return None
 
     @property
@@ -202,7 +180,7 @@ class UserProfileBackend(BaseUserProfileBackend):
                 for element in elements
                 if element.get_attribute("href")
             ]
-            return organizations
+            return list(set(organizations))
         return None
 
     @property
@@ -214,6 +192,24 @@ class UserProfileBackend(BaseUserProfileBackend):
                 timeout=self.timeout,
             )
             number_of_repositories: str = element.text
+            return number_of_repositories
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i1repositories-tab"]/span[@class="Counter"]',
+                timeout=self.timeout,
+            )
+            number_of_repositories = element.text
+            return number_of_repositories
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i1repositories-tab"]/span',
+                timeout=self.timeout,
+            )
+            number_of_repositories = element.text
             return number_of_repositories
         return None
 
@@ -227,6 +223,25 @@ class UserProfileBackend(BaseUserProfileBackend):
             )
             number_of_stars: str = element.text
             return number_of_stars
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i4stars-tab"]/span[@class="Counter"]',
+                timeout=self.timeout,
+            )
+            number_of_stars = element.text
+            return number_of_stars
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i4stars-tab"]/span',
+                timeout=self.timeout,
+            )
+            number_of_stars = element.text
+            return number_of_stars
+
         return None
 
     @property
@@ -242,7 +257,7 @@ class UserProfileBackend(BaseUserProfileBackend):
                 for element in elements
                 if element.get_attribute("href")
             ]
-            return pinned_repositories
+            return list(set(pinned_repositories))
         return None
 
     @property
@@ -266,6 +281,25 @@ class UserProfileBackend(BaseUserProfileBackend):
             )
             projects: str = element.text or "0"
             return projects
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i2projects-tab"]/span[@class="Counter"]',
+                timeout=self.timeout,
+            )
+            projects = element.text or "0"
+            return projects
+
+        with contextlib.suppress(TimeoutException, NoSuchElementException):
+            element = self.wd.web_driver_wait_till_existence(
+                By.XPATH,
+                '//a[@data-tab-item="i2projects-tab"]/span',
+                timeout=self.timeout,
+            )
+            projects = element.text or "0"
+            return projects
+
         return None
 
     @property
@@ -326,3 +360,29 @@ class UserProfileBackend(BaseUserProfileBackend):
     @property
     def _url(self) -> Optional[str]:
         return str(self.wd.current_url)
+
+    def get_profile(self) -> UserProfile:
+        return UserProfile(
+            avatar=self._avatar or None,
+            fullname=self._fullname or None,
+            username=self._username or None,
+            bio=self._bio or None,
+            followers=self._followers or None,
+            following=self._following or None,
+            works_for=self._works_for or None,
+            home_location=self._home_location or None,
+            email=self._email or None,
+            profile_website_url=self._profile_website_url or None,
+            social=self._social or None,
+            achievements=self._achievements or None,
+            organizations=self._organizations or None,
+            number_of_repositories=self._number_of_repositories or None,
+            number_of_stars=self._number_of_stars or None,
+            pinned_repositories=self._pinned_repositories or None,
+            uid=self._uid or None,
+            projects=self._projects or None,
+            contribs=self._contribs or None,
+            contrib_matrix=self._contrib_matrix or None,
+            type=self._type or None,
+            url=self._url or None,
+        )

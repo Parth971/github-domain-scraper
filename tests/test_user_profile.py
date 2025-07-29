@@ -11,10 +11,10 @@ class TestUserProfileExtractor(unittest.TestCase):
         self.assertIsInstance(result, dict)
         self.assertEqual(len(result), 1)
         self.assertIn("Parth971", result)
-        self.assertEqual(result["Parth971"]["username"], "Parth971")
-        self.assertEqual(result["Parth971"]["fullname"], "Parth")
+        self.assertEqual(result["Parth971"].username, "Parth971")
+        self.assertEqual(result["Parth971"].fullname, "Parth")
         self.assertEqual(
-            result["Parth971"]["avatar"],
+            result["Parth971"].avatar,
             "https://avatars.githubusercontent.com/u/58165487?v=4",
         )
 

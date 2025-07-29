@@ -20,11 +20,11 @@ import argparse
 import json
 from typing import List, Optional, Union
 
-from .extractor import (
+from github_domain_scraper.extractor import (
     LinkExtractor,
     UserProfileInformationExtractor,
 )
-from .logger import get_logger
+from github_domain_scraper.logger import get_logger
 
 logger = get_logger("github_domain_scraper")
 
@@ -47,7 +47,12 @@ def parse() -> argparse.Namespace:
 
 def extract_user_profiles(usernames: Union[str, List[str]], jsonfile: str) -> None:
     extractor = UserProfileInformationExtractor(github_username=usernames)
-    result = extractor.extract()
+    extracted_result = extractor.extract()
+
+    result = {
+        username: user_profile.to_dict()
+        for username, user_profile in extracted_result.items()
+    }
 
     if jsonfile:
         with open(jsonfile, "w") as file:

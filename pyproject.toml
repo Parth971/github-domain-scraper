@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "github-domain-scraper"
-version = "3.1.0"
+version = "3.2.0"
 description = "This Python package is designed for web crawling through input links that belong to GitHub domains. It offers a wide range of functionalities beyond simple crawling, including the ability to list repositories associated with the provided link, download GitHub repositories, and extract the contents of GitHub repositories."
 readme = "README.md"
 authors = [{ name = "Parth971", email = "desaiparth971@gmail.com" }]
@@ -37,7 +37,7 @@ repository    = "https://github.com/Parth971/github-domain-scraper"
 
 
 [tool.bumpver]
-current_version = "3.1.0"
+current_version = "3.2.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true
